@@ -1,6 +1,7 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation} from '@angular/core';
+import {ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation} from '@angular/core';
 import {MatSliderChange} from '@angular/material/slider';
 import {ThemePalette} from '@angular/material/core';
+import { coerceNumberProperty, NumberInput, BooleanInput } from '@angular/cdk/coercion';
 
 export interface RangeType {
   min: number;
@@ -12,40 +13,73 @@ export interface RangeType {
   templateUrl: './ngx-mat-range-slider.component.html',
   styleUrls: ['./ngx-mat-range-slider.component.scss'],
   encapsulation: ViewEncapsulation.None,
+  host: {
+    'class': 'mat-range-slider mat-slider mat-slider-horizontal',
+    '[class.mat-slider-has-ticks]': 'tickInterval',
+    '[class.mat-slider-disabled]': 'disabled',
+  }
 })
 export class NgxMatRangeSliderComponent implements OnInit {
   isMinValueInit = true;
   isMaxValueInit = true;
   thumbLabel = true;
-  @Input() minValue: number;
-  @Input() maxValue: number;
-  @Input() minColor: ThemePalette = 'accent';
-  @Input() maxColor: ThemePalette = 'primary';
-  @Input() showRuler = false;
 
-  @Input() formatLabel = (v) => v;
+  maxConf = 100;
+  minConf = 0;
 
-  @Output() output = new EventEmitter<RangeType>();
+  maxValueConf = this.maxConf;
+  minValueConf = this.minConf;
 
-  maxConf = 75;
+  constructor(private changeDetector: ChangeDetectorRef){
+  }
 
   @Input()
-  set max(m: number) {
-    this.maxConf = parseInt(m.toString(), 10);
+  set max(v: NumberInput) {
+    console.debug("max()", "min", this.min, "max", this.max, "maxValue", this.maxValue, "minValue", this.minValue, "v", v);
+    this.maxConf = coerceNumberProperty(v, this.max);
   }
   get max(): number {
     return this.maxConf;
   }
 
-  minConf = 18;
-
   @Input()
-  set min(m: number) {
-    this.minConf = parseInt(m.toString(), 10);
+  set min(v : NumberInput) {
+    console.debug("min()", "min", this.min, "max", this.max, "maxValue", this.maxValue, "minValue", this.minValue, "v", v);
+    this.minConf = coerceNumberProperty(v, this.min);
   }
   get min(): number {
     return this.minConf;
   }
+
+  @Input()
+  set maxValue(v: NumberInput) {
+    console.debug("maxValue()", "min", this.min, "max", this.max, "maxValue", this.maxValue, "minValue", this.minValue, "v", v);
+    this.maxValueConf = coerceNumberProperty(v, this.maxValue);
+  }
+  get maxValue(): number {
+    return this.maxValueConf;
+  }
+
+  @Input()
+  set minValue(v : NumberInput) {
+    console.debug("minValue()", "min", this.min, "max", this.max, "maxValue", this.maxValue, "minValue", this.minValue, "v", v);
+    this.minValueConf = coerceNumberProperty(v, this.minValue);
+  }
+  get minValue(): number {
+    return this.minValueConf;
+  }
+
+  @Input() minColor: ThemePalette = 'accent';
+  @Input() maxColor: ThemePalette = 'primary';
+  @Input() showRuler: BooleanInput = false;
+  @Input() step: NumberInput = 1;
+  @Input() tickInterval: NumberInput = 1;
+
+  @Input() formatLabel = (v) => v;
+
+  @Output() output = new EventEmitter<RangeType>();
+  @Output() minValueChange = new EventEmitter<number>();
+  @Output() maxValueChange = new EventEmitter<number>();
 
   @Input()
   set value(v: { min: number, max: number }) {
@@ -66,11 +100,23 @@ export class NgxMatRangeSliderComponent implements OnInit {
     }
     this.isMinValueInit = (this.minValue === this.min);
     this.isMaxValueInit = (this.maxValue === this.max);
-    this.output.emit({min: this.minValue, max: this.maxValue});
+    this.minValueChange.emit(coerceNumberProperty(this.minValue, this.minConf));
+    this.maxValueChange.emit(coerceNumberProperty(this.maxValue, this.maxConf));
+    this.output.emit({min: coerceNumberProperty(this.minValue, this.minConf), max: coerceNumberProperty(this.maxValue, this.maxConf)});
   }
 
-  valueChange(): void {
-    this.output.emit({min: this.minValue, max: this.maxValue});
+  onMinValueChange(): void {
+    this.minValueChange.emit(coerceNumberProperty(this.minValue, this.minConf));
+    this.onValueChange();
+  }
+
+  onMaxValueChange(): void {
+    this.maxValueChange.emit(coerceNumberProperty(this.maxValue, this.maxConf));
+    this.onValueChange();
+  }
+
+  private onValueChange(): void {
+    this.output.emit({min: coerceNumberProperty(this.minValue, this.minConf), max: coerceNumberProperty(this.maxValue, this.maxConf)});
   }
 
   minValueInput(a: MatSliderChange): void {
