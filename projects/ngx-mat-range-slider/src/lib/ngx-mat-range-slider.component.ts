@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation} from '@angular/core';
 import {MatSliderChange} from '@angular/material/slider';
 import {ThemePalette} from '@angular/material/core';
 import { coerceNumberProperty, NumberInput, BooleanInput } from '@angular/cdk/coercion';
