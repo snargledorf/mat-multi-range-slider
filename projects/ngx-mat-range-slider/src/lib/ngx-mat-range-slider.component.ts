@@ -20,8 +20,6 @@ export interface RangeType {
   }
 })
 export class NgxMatRangeSliderComponent implements OnInit {
-  isMinValueInit = true;
-  isMaxValueInit = true;
   thumbLabel = true;
 
   maxConf = 100;
@@ -29,9 +27,6 @@ export class NgxMatRangeSliderComponent implements OnInit {
 
   maxValueConf = this.maxConf;
   minValueConf = this.minConf;
-
-  constructor(private changeDetector: ChangeDetectorRef){
-  }
 
   @Input()
   set max(v: NumberInput) {
@@ -71,7 +66,7 @@ export class NgxMatRangeSliderComponent implements OnInit {
 
   @Input() minColor: ThemePalette = 'accent';
   @Input() maxColor: ThemePalette = 'primary';
-  @Input() showRuler: BooleanInput = false;
+
   @Input() step: NumberInput = 1;
   @Input() tickInterval: NumberInput = 1;
 
@@ -87,10 +82,6 @@ export class NgxMatRangeSliderComponent implements OnInit {
     this.maxValue = v.max;
   }
 
-  get rulerArray(): number[] {
-    return [...Array(this.max - this.min).keys()].map(i => i + this.min);
-  }
-
   ngOnInit(): void {
     if (!this.minValue) {
       this.minValue = this.min;
@@ -98,8 +89,7 @@ export class NgxMatRangeSliderComponent implements OnInit {
     if (!this.maxValue) {
       this.maxValue = this.max;
     }
-    this.isMinValueInit = (this.minValue === this.min);
-    this.isMaxValueInit = (this.maxValue === this.max);
+
     this.minValueChange.emit(coerceNumberProperty(this.minValue, this.minConf));
     this.maxValueChange.emit(coerceNumberProperty(this.maxValue, this.maxConf));
     this.output.emit({min: coerceNumberProperty(this.minValue, this.minConf), max: coerceNumberProperty(this.maxValue, this.maxConf)});
@@ -120,16 +110,14 @@ export class NgxMatRangeSliderComponent implements OnInit {
   }
 
   minValueInput(a: MatSliderChange): void {
-    this.isMinValueInit = (a.value === this.min);
     if (a.value >= this.maxValue) {
-      a.source.value = this.maxValue;
+      a.source.value = this.maxValue-1;
     }
   }
 
   maxValueInput(a: MatSliderChange): void {
-    this.isMaxValueInit = (a.value === this.max);
     if (a.value <= this.minValue) {
-      a.source.value = this.minValue;
+      a.source.value = this.minValue+1;
     }
   }
 
