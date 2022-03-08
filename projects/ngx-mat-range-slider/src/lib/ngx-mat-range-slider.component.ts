@@ -89,10 +89,6 @@ export class NgxMatRangeSliderComponent implements OnInit {
     if (!this.maxValue) {
       this.maxValue = this.max;
     }
-
-    this.minValueChange.emit(coerceNumberProperty(this.minValue, this.minConf));
-    this.maxValueChange.emit(coerceNumberProperty(this.maxValue, this.maxConf));
-    this.output.emit({min: coerceNumberProperty(this.minValue, this.minConf), max: coerceNumberProperty(this.maxValue, this.maxConf)});
   }
 
   onMinValueChange(): void {
