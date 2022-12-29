@@ -42,6 +42,9 @@
           }
         }
       }
-    }},
-  "defaultProject": "ngx-mat-range-slider"
+    }
+  },
+  "cli": {
+    "analytics": false
+  }
 }
